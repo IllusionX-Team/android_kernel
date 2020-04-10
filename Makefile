@@ -671,6 +671,13 @@ LD		:= $(LDGOLD)
 endif
 ifdef CONFIG_LD_LLD
 LD		:= $(LDLLD)
+# Enable additional LLVM's tools when using LLD
+AS      := llvm-as
+AR      := llvm-ar
+NM      := llvm-nm
+OBJCOPY := llvm-objcopy
+OBJDUMP := llvm-objdump
+STRIP   := llvm-strip
 endif
 LDFINAL_vmlinux := $(LD)
 
