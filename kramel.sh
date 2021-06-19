@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 echo "Cloning dependencies"
-git clone --depth=1 https://github.com/kdrag0n/proton-clang clang
+git clone --depth=1 https://github.com/mvaisakh/gcc-arm64 -b gcc-master gcc64
+git clone --depth=1 https://github.com/mvaisakh/gcc-arm -b gcc-master gcc32
 git clone --depth=1 https://github.com/stormbreaker-project/AnyKernel3 -b surya AnyKernel
 git clone --depth=1 https://android.googlesource.com/platform/system/libufdt libufdt
 echo "Done"
