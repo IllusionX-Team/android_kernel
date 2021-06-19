@@ -1,0 +1,39 @@
+version: v1.0
+name: Kramel
+
+agent:
+  machine:
+    type: e1-standard-4
+
+  containers:
+    - name: main
+      image: starlight2834/ci_docker:latest
+
+auto_cancel:
+  queued:
+    when: "true"
+  
+blocks:
+  - name: "Kernel"
+    task:
+      secrets:
+        - name: api-keys
+
+      prologue:
+        commands:
+          - export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+          - export KBUILD_BUILD_USER="forenche"
+          - export KBUILD_BUILD_HOST="semaphore-ci"
+
+      jobs:
+      - name: Build
+        commands:
+          - mkdir kernul && wget https://gitlab.com/Forenche/https-github.com-stormbreaker-project-kernel_xiaomi_surya/-/archive/main/https-github.com-stormbreaker-project-kernel_xiaomi_surya-main.tar.gz && cd kernul
+          - apt update && apt-get install -y build-essential bc python curl git zip ftp gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev lftp zstd libfl-dev clang flex bison cpio
+          - chmod +x kramel.sh
+          - bash kramel.sh
+
+      epilogue:
+        on_pass:
+          commands:
+            - bash publish.sh
