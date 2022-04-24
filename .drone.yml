@@ -1,24 +1,31 @@
 kind: pipeline
 name: Surya_kramel
 
-platform:
-  os: linux
-  arch: amd64
-
 clone:
-  depth: 1
+  disable: true
 
 steps:
-  - name: setup&kramel
-    image: starlight2834/ci_docker:latest
-    environment:
-      BOTTOKEN:
-        from_secret: token
-      CHATID:
-        from_secret: chat_id
-    commands:
-      - mkdir kernul && cd kernul && wget https://github.com/IllusionX-Team/android_kernel/archive/refs/heads/main.zip
-      - apt update && apt-get install -y build-essential bc python curl git zip ftp gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev lftp zstd wget libfl-dev clang flex bison cpio
-      - chmod +x kramel.sh
-      - bash kramel.sh
-      - bash upload.sh
+- name: setup
+  image: seralij556/kernel:latest
+  environment:
+    REPO:
+      from_secret: repo
+    BRANCH:
+      from_secret: branch
+    TG_BOT_TOKEN:
+      from_secret: bot
+    TG_CHAT_ID:
+      from_secret: chat
+    CMD:
+      from_secret: cmd
+    ARG:
+      from_secret: arg
+    REPO_TYPE:
+      from_secret: type
+  commands:
+    - if [ -f /noclone3 ]; then NOC3="/noclone3"; fi && cd /drone/src && case "$REPO_TYPE" in *pri*) $NOC3 git clone --depth=1 --single-branch "$REPO" -b "$BRANCH" . ;; *) $NOC3 git clone --bare --depth=1 --filter=blob:none "https://github.com/$REPO" -b "$BRANCH" . && $NOC3 aria2c -q -j4 -x4 -s4 -k50M -c "https://codeload.github.com/$REPO/zip/refs/heads/$BRANCH" && unzip ./*.zip -d . > /dev/null 2>&1 && mv -v "$(ls -1 ./*.zip | cut -c3- | sed "s/.zip//g")"/* . > /dev/null 2>&1 ;; esac && $NOC3 bash -c "$CMD $ARG"
+trigger:
+  branch:
+  - setup-semaphore
+  event:
+  - custom
